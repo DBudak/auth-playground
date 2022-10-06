@@ -1,0 +1,67 @@
+OAuth 2.0:
+
+Authorization framework developed by IETF
+Its fundamental focus is to fix access delegation problem
+OpenID Connect (OIDC) is an identity layer built on top of OAuth 2.0
+
+Access delegation can be of 2 modes:
+	With credentials sharing 
+        Literally giving away credentials. Not safe. OAuth 1.0 tried to fix it in 2007, OAuth 2.0 became 
+        the standard of it in 2012, RFC 6749
+	Without credentials sharing
+
+OAuth 1.0 is a concrete protocol
+OAuth 2.0 is an extendable framework
+Conceptually both solve the access delegation problem in a similar way
+
+-------------------------------------------------
+
+Authentication:
+
+Verification of identity
+Old School - trust the network. Not safe anymore
+mTLS private-public key. Needs a lot of key management
+JWTs
+
+Authorization:
+
+Verification of capabilities
+PDP - Policy detection point
+Centralized PDP - one service containing all policies
+Embedded PDP - defined centrally but stored in each service deciding on policies 
+PAP - policy administration point, place where policies are defined for embedded PDP, 
+    services subscribe to topic to get updates
+OR services load policies from the same place and need a restart on policy update
+
+-------------------------------------------------
+
+Passing user info:
+
+Can pass in Header. Requires trust to the passing service
+Can pass JWT issued by passing service, no additional security to the above approach
+Can pass JWT issues by 3rd STS which signs the JWT, and all services implicitly trust
+JWT cannot be altered without breaking the signature
+
+Trust domains:
+
+App can be divided into trust domains
+Trust domains have their own STS (Security Token Service) and API Gateway
+When domains need to talk to each other JWT of one domain gets exchanged to JWT of another
+
+-------------------------------------------------
+
+OAuth 2.0 Terminology and Actors:
+
+OAuth 2.0 in Facebook example, grant flow:
+	1. Third party web app redirects user to Facebook
+	2. Facebook authenticates and gets user consent to share a limited lifetime, limited permission scope token
+	3. Third party app attaches token in its requests to Facebook API
+
+OAuth 2.0 Terminology in this example:
+
+	Resource Owner - Facebook user, decides who should have and which level of access to their resource
+	Authorization Service - Facebook, knows how to authenticate, and grants access to resources
+	Resource Service - Facebook API, guards resources of Resource Owner and only allows authorized and authenticated access to them
+	Client - Third party web application, consumes a resource on behalf of Resource owner, given sufficient access vended to Authorization Service
+	Access Token - Token issued by Authorization Service, validated by Resource Service. To validate RS might talk to AS
+	Scope - defines purpose of the AT, RS should verify Scope is enough to perform the operation

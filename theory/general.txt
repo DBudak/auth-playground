@@ -1,0 +1,13 @@
+Basic auth
+https://www.rfc-editor.org/rfc/rfc1945#section-11.1
+
+    User and password credentials sharing mechanism
+
+mTLS: Mutual Transport Layer Security
+    is a mechanism where client application verifies a server and server
+    verifies the client by exchanging certificate and proving that Each
+    owns corresponding client keys
+
+    certificates are time bound
+    the private key never leaves the owner and is never passed by wire
+    

@@ -1,0 +1,29 @@
+JWT (JSON Web Token)
+
+	- JWT is a container that carries assertions or claims from one place to another in a cryptographically safe manner
+	- JWS becomes JWT if it carriesJSON object as payload and follows compact serialization
+
+	Claims
+		iss - identifier for the issuer
+		sub - identifier of the subject (or the owner) of the jet
+		aud - identifier for the audience (indented recipient).
+		exp - expiration time in unix epoch
+		iat - issuing time in unix epoch
+		nbf - not before. Unix epoch time after which token becomes valid
+		jti - unique token identifier in Authorization Service
+    Scopes
+	    - Define the list of capabilities available to the token
+	    - When Client Application requests for a token it can specify scopes. Authorization Service does not have to respect the requested scopes
+	Pitfalls
+		- if Auth server revokes token API GW will never know and continue to think is valid. Addressed by making JWTs short-lived or pub/subbing this 
+
+-------------------------------------------------
+OpenID Connect
+
+	- Additional identity layer built on top of OAuth 2.0
+	- ID token - signed JWT with user information
+	- Access token - signed JWT with ids, sub, aud, iat, exp claims, representing authentication/authorizaiton
+
+	Flow:
+		1. Client Application sends scope=openid in token request
+		2. ID token is sent along with the access token

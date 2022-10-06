@@ -1,0 +1,78 @@
+OAuth 2.0 Grant Types:
+
+Standard Grant Types
+-------------------------------------------------
+	Client Credentials
+		- Authentication between two systems with no end user
+		- Client Application is the Resource Owner
+		- Each Client carries a set of credentials: client_id and client_secret
+
+		Flow
+			1. Client Application (also a Resource Owner) sends client_id and client_secret to Authorization Service
+			2. Authorization Service checks the validity of id and secret and issues an Access Token
+
+    Resource Owner Password
+		- Authentication between trusted applications
+		- Is an extension of client credentials with support for separate resource owner
+		- This is access delegation with credentials sharing and is in OAuth 2.0 to help migrate legacy systems. 
+		- Should be avoided.
+
+		Flow
+			1. Resource owner provides Client Application	their username and password
+			2. Client Application makes a token request to Authorization Service with username, password, and its own client_id cleint_secret
+-------------------------------------------------
+	Authorization Code
+		- Authentication between two systems with end user
+		- Used with systems that can handle redirect redirect_uri is the location where Authorization Service needs to redirect the browser after successful authentication
+		- Authorization code is provided as a url parameter in an HTTP redirect on a provided redirect_uri
+			Above is achieved by Authorization service via Location HTTP Header on the Response. Example: redirect_uri?code=value
+		- redirect_uri in the request should be equal to redirect_uri used to register application with     Authorization Service
+		- Client Application can also request scopes it needs on token, by adding optional parameter scopes
+		Authorization code is sensitive public information, therefore should have the lifespan no more than 30 seconds and be a one-time-use
+		- If the code is used more than once the Authorization Service revokes all tokens issued against it
+		- This flow doesn’t mandate authenticating Client Application so client_secret is not required. This is useful for client side Client Applications
+
+		Flow
+			0. Resource Owner initiates the login flow
+			1. Client Application requests authorization code from Authorization Service by providing client_id, reponse_type=code and redirect_uri
+			2. Authorization Service validates client_id and redirect_uri
+			3. On valid and assuming no valid user session is present Authorization Service presents the Resource Owner with a login screen
+			4. Resource Owner shares credentials on login screen. Credentials are validated by Authorization Service
+			5. On valid credentials Authorization Service issues the authorization code and provides it to  the user agent via HTTP redirect to the Client Application
+			6. Upon receiving redirect Client Application issues a token request to Authorization Server, sending Authorization Code via code=value, grant_type=authorization_code, redirect_uri Header
+			7. On  valid, Authorization Service returns a valid token
+-------------------------------------------------
+	Implicit
+		- Don’t use it
+		- Similar to Authorization Code without  getting the authorization code step
+		- Authorization Service issues token directly in response to implicit grant request
+		- Client Application can also request scopes it needs on token, by adding optional parameter scopes
+		- Does not provide refresh token
+		- Token will remain in browser history because it was passed as a uri parameter
+
+		Flow
+			0. Resource Owner initiates the login flow
+			1. Client Application initiates implicit grant request to Authorization Service. Including client_id, redirect_uri, response_type=token
+			2. Authorization Service validates client_id and request_uri
+			3. On valid and assuming no valid user session is present Authorization Service presents the Resource Owner with a login screen
+			4. Resource Owner shares credentials on login screen. Credentials are validated by Authorization Service
+			5. On valid credentials Authorization Service presents user with consent page
+			6. On received user consent, Authorization Service provides access token on a redirect_uri. Example redirect_uri#access_token=value
+			 	Because access token is denoted by # it is not submitted to redirect_uri server. Only Authorization Server and user agent (browser)  get to know the value of the token 
+-------------------------------------------------
+    Refresh token
+		- Used for refresh of expired tokens
+		- Not present in client credentials and implicit 
+
+		Flow
+			1. Token expires, Resource Owner requests Client Application to renew
+			2. Client Application sends client_id client_secret and refresh_token to Authorization Service
+			3. Authorization service returns new token. refresh_token in it can be the same, or a new one, OAuth doesn’t specify rules in this case
+-------------------------------------------------
+OAuth 2.0 is extendable and not limited to the above 5 Grant Types. Other common Grant Types:
+
+	SAML
+		Authentication in systems using SAML 2.0, RFC 7522
+
+	JWT Profile
+		Authentication in systems using OpenID, RFC 7523
